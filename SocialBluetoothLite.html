@@ -19,11 +19,14 @@ class Tooth extends StatefulWidget {
 
 class _ToothState extends State<Tooth> {
 
+  String refresh="";
+
   final blue.FlutterBlue flutterBlue = blue.FlutterBlue.instance;
   final List<dynamic> devicesList = new List<dynamic>();
 
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
-
+   
+    var _connectedDevice;
 
   _addDeviceTolist(final dynamic device) {
      if (!devicesList.contains(device)) {
@@ -93,11 +96,11 @@ class _ToothState extends State<Tooth> {
    
   }
 
-
-
     Future<dynamic> btn() async{
-
-
+     
+     setState(() {
+       refresh="";
+     });
     flutterBlue.connectedDevices
         .asStream()
         .listen((List<blue.BluetoothDevice> devices) {
@@ -106,20 +109,25 @@ class _ToothState extends State<Tooth> {
         _addDeviceTolist(device);
       }
     });
-       
+
+      
       flutterBlue.scanResults.listen((List<dynamic> results) async {
        
       for (dynamic result in results)  {
+
          print("start");
+        
+
          await Future.delayed(Duration(seconds:5));
-          //result1=result.device;
           _addDeviceTolist(result);
 
          print(result.device.name);
          print(result.rssi);
+          _connectedDevice = result.device.name;
 
            if(result.rssi<=-90)
            {
+             await Future.delayed(Duration(seconds:2));
              await showNotification();
            }
          
@@ -131,43 +139,48 @@ class _ToothState extends State<Tooth> {
 
    Widget _buildListViewOfDevices() {
     List<Container> containers = new List<Container>();
+    
     for (dynamic result in devicesList) {
       containers.add(
         Container(
           height: 50,
-          child: Row(
-            mainAxisSize: MainAxisSize.max,
-            
-            //crossAxisAlignment: CrossAxisAlignment.max,
+          child: Column(
+           mainAxisSize: MainAxisSize.max,
             children: <Widget>[
+              Text("$refresh"),
               Expanded(
-                child: Column(
+                child: Row( 
+                  
                   mainAxisSize: MainAxisSize.max,
                   crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
+                  children: <Widget>[  
+                    
+                   Text("DeviceName:"),
                     Text(result.device.name == '' ? '(unknown bluetooth device)' : result.device.name),
+                    
+                    Text("  Rssi value  "),
                     Text(result.rssi.toString()),
-                   
-                  //  RaisedButton.icon(
-                  //    onPressed: (){
-                  //       showNotification();
-                  //    }, 
-                  //    icon:Icon( Icons.ac_unit), 
-                  //    label: Text("data"),
-                  //    ),
-                    //Text(rssi),
-                  
+                   // Text(result.device.id.toString()),
+
+         
                   ],
+
+                  
                 ),
                 
+              
               ),
+              
              
             ],
+            
+                      
           ),
+          
+        
         ),
       );
     }
-     
    return ListView(
      padding: const EdgeInsets.all(8),
      children: <Widget>[
@@ -175,45 +188,43 @@ class _ToothState extends State<Tooth> {
      ],
    );
     
-
    }
 
+  
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return  Scaffold(
       appBar:AppBar(
-        title:Text("Myapp"),
+        title:Text("Social Distancing App"),
       ),
-
-      body: _buildListViewOfDevices(),
-
-      // body: Container(
-      //     child: Column(
-      //     children: <Widget>[
-      //       Padding(
-      //         padding:EdgeInsets.all(8.0),
-      //         child: Row(
-      //           children: <Widget>[
-      //             //Text(result1),
-      //             SizedBox(width: 10,),
-      //             Text("data1"),
-                  
-      //           ],
-      //         ),
-
-      //       )
-      //     ],
-      //     ),
-      //   ),
-        
-
+    
+      body:SafeArea(
+              child:Container(
+                decoration:new BoxDecoration(
+                    //color: const Color(0xff7c94b6),
+                    color: Colors.white,
+                  image:DecorationImage(
+                    image:AssetImage('assets/download.jpeg'), 
+                    fit: BoxFit.fitWidth,
+                  colorFilter: new ColorFilter.mode(Colors.white.withOpacity(0.2), BlendMode.dstATop),
+                  ),
+                ),
+                child: _buildView(),
+              )
+      ),
+      
       floatingActionButton: Container(
         height: 60,
         width: 60,
       child:FloatingActionButton(
-        onPressed: (){
-          btn();
+        onPressed: () async{
+          setState(() {
+            refresh="refershing.. please wait.....";
+          });
+          await Future.delayed(Duration(seconds:5));
+           btn();
+          
         },
         
         child:Text(
@@ -226,9 +237,19 @@ class _ToothState extends State<Tooth> {
           ),),
 
         ),
-    )
+    ),
+  
     );
   }
+
+
+  ListView _buildView() {
+    if (_connectedDevice != null) {
+      return _buildListViewOfDevices();
+    }
+    return _buildListViewOfDevices();
+  }
+
 
 
   showNotification() async {
