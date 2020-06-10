@@ -127,6 +127,8 @@ class _ToothState extends State<Tooth> {
       }
     });
 
+    int count=0;
+
       
       flutterBlue.scanResults.listen((List<dynamic> results) async {
        
@@ -142,10 +144,19 @@ class _ToothState extends State<Tooth> {
          print(result.rssi);
           _connectedDevice = result.device.name;
 
+
+
            if(result.rssi<=-80)
            {
-             await Future.delayed(Duration(seconds:2));
-             await showNotification();
+             count=count+1;
+             //await showNotification();
+           }
+
+           if(count<3)
+           {
+              await Future.delayed(Duration(seconds:2));
+              await showNotification();
+              count=0;
            }
          
          print("done");
@@ -174,10 +185,20 @@ class _ToothState extends State<Tooth> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[  
                     
-                   Text("DeviceName:"),
+                   Text("DeviceName:",
+                   style: TextStyle(
+                     fontWeight: FontWeight.w500,
+                     letterSpacing: 1.0,
+                     color:Colors.black,
+                   ),),
                     Text(result.device.name == '' ? '(unknown bluetooth device)' : result.device.name),
                     
-                    Text("  Rssi value  "),
+                    Text("  Rssi value  ",
+                    style: TextStyle(
+                     fontWeight: FontWeight.w500,
+                     letterSpacing: 1.0,
+                     color:Colors.black,
+                   ),),
                     Text(result.rssi.toString()),
                    // Text(result.device.id.toString()),
 
@@ -235,7 +256,16 @@ class _ToothState extends State<Tooth> {
     return  Scaffold(
       appBar:AppBar(
         title:Text("Social Distancing App"),
-       
+        backgroundColor: Colors.orangeAccent[700],
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(
+              Icons.directions_run,
+             color: Colors.white,
+            ),
+             onPressed:(){},
+            ),
+        ],
       ),
     
       body:SafeArea(
@@ -256,7 +286,10 @@ class _ToothState extends State<Tooth> {
       floatingActionButton: Container(
         height: 60,
         width: 60,
-      child:FloatingActionButton(
+      child:FloatingActionButton.extended(
+         backgroundColor:Colors.orangeAccent[700],
+         label: Text("refresh"),
+         icon:Icon(Icons.refresh) ,
         onPressed: () async{
            
           setState(() {
@@ -265,14 +298,14 @@ class _ToothState extends State<Tooth> {
           await Future.delayed(Duration(seconds:3));
            btn();
         },
-        child:Text(
-          'Refresh',
-          style: TextStyle(
-            fontSize: 13,
-            color: Colors.red,
-            backgroundColor:Colors.white, 
+        // child:Text(
+        //   'Refresh',
+        //   style: TextStyle(
+        //     fontSize: 13,
+        //     color: Colors.red,
+        //     backgroundColor:Colors.white, 
 
-          ),),
+        //   ),),
 
         ),
         
@@ -291,18 +324,40 @@ class _ToothState extends State<Tooth> {
 
 
 
-  showNotification() async {
-    var android = new AndroidNotificationDetails(
-        'channel id', 'channel NAME', 'CHANNEL DESCRIPTION',sound: RawResourceAndroidNotificationSound('alert'),
-        priority: Priority.High,importance: Importance.Max,
-    );
+  // showNotification() async {
+  //   var android = new AndroidNotificationDetails(
+  //       'channel id', 'channel NAME', 'CHANNEL DESCRIPTION',sound: RawResourceAndroidNotificationSound('alert'),
+  //       priority: Priority.High,importance: Importance.Max,
+  //   );
     
-    var iOS = new IOSNotificationDetails(sound: "alert.aiff");
-    var platform = new NotificationDetails(android, iOS);
-    await  flutterLocalNotificationsPlugin.show(
-        0, 'Safety app', 'Requesting to maintain social distance', platform,
-         payload: 'Please maintain the social distance ');
-         print("result:Notification came ");
-  }
+  //   var iOS = new IOSNotificationDetails(sound: "alert.aiff");
+  //   var platform = new NotificationDetails(android, iOS);
+  //   await  flutterLocalNotificationsPlugin.show(
+  //       0, 'Safety app', 'Requesting to maintain social distance', platform,
+  //        payload: 'Please maintain the social distance ');
+  //        print("result:Notification came ");
+  // }
+
+
+  Future showNotification() async {
+  var androidPlatformChannelSpecifics = new AndroidNotificationDetails(
+      'your channel id', 'your channel name', 'your channel description',
+      sound: RawResourceAndroidNotificationSound('alert'),
+      importance: Importance.Max,
+      priority: Priority.High);
+  var iOSPlatformChannelSpecifics =
+      new IOSNotificationDetails(sound: "alert.aiff");
+  var platformChannelSpecifics = new NotificationDetails(
+      androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
+  await flutterLocalNotificationsPlugin.show(
+    0,
+    'Safety app',
+    'Requesting to maintain social distance',
+    platformChannelSpecifics,
+    payload: 'Please maintain the social distance',
+  );
+    print("result:Notification came ");
+}
+
 
 }
