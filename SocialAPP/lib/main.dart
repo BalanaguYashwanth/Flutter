@@ -13,6 +13,7 @@ import 'package:safety/additional.dart';
 void main()
 {
   runApp(MaterialApp(
+    debugShowCheckedModeBanner: false,
     home:Tooth(),
   // darkTheme: ThemeData(
   //   brightness: Brightness.dark,
@@ -118,10 +119,13 @@ class _ToothState extends State<Tooth> {
 
     Future<dynamic> btn() async{
       
+      devicesList.clear();
      
      setState(() {
        refresh="";
      });
+
+    
     flutterBlue.connectedDevices
         .asStream()
         .listen((List<blue.BluetoothDevice> devices) {
