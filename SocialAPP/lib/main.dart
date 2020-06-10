@@ -14,7 +14,11 @@ void main()
 {
   runApp(MaterialApp(
     home:Tooth(),
-  ));
+  // darkTheme: ThemeData(
+  //   brightness: Brightness.dark,
+  // ),
+  ),
+  );
 }
 
 
@@ -168,6 +172,8 @@ class _ToothState extends State<Tooth> {
   
 
    Widget _buildListViewOfDevices() {
+
+     
     List<Container> containers = new List<Container>();
     
     for (dynamic result in devicesList) {
@@ -178,6 +184,8 @@ class _ToothState extends State<Tooth> {
            mainAxisSize: MainAxisSize.max,
             children: <Widget>[
               Text("$refresh"),
+
+
               Expanded(
                 child: Row( 
                   
@@ -255,16 +263,27 @@ class _ToothState extends State<Tooth> {
   Widget build(BuildContext context) {
     return  Scaffold(
       appBar:AppBar(
-        title:Text("Social Distancing App"),
+        title:Text("Safety App",
+        style: TextStyle(
+               color: Colors.white,
+             ),),
         backgroundColor: Colors.orangeAccent[700],
         actions: <Widget>[
-          IconButton(
-            icon: Icon(
-              Icons.directions_run,
+           FlatButton.icon(
+             onPressed: (){
+               Navigator.push(context, MaterialPageRoute(
+                 builder:(BuildContext context)=>Addition())
+                 );
+             },
+             label: Text("Instructions to follow",
+             style: TextStyle(
+               color: Colors.white,
+               fontSize: 16
+             ),),
+             icon:Icon( Icons.info,
              color: Colors.white,
-            ),
-             onPressed:(){},
-            ),
+             ),
+             ),
         ],
       ),
     
@@ -280,15 +299,18 @@ class _ToothState extends State<Tooth> {
                   ),
                 ),
                 child: _buildView(),
+                
               )
       ),
+
       
       floatingActionButton: Container(
-        height: 60,
-        width: 60,
+        height: 50,
+        width: 100,
+        
       child:FloatingActionButton.extended(
          backgroundColor:Colors.orangeAccent[700],
-         label: Text("refresh"),
+         label: Text("Refresh"),
          icon:Icon(Icons.refresh) ,
         onPressed: () async{
            
