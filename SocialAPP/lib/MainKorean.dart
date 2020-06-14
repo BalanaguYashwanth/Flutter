@@ -5,6 +5,9 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_ble_lib/flutter_ble_lib.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:ble/additional.dart';
+import 'package:flutter/cupertino.dart';
+
+
 void main() {
   runApp(MyApp());
 }
@@ -192,18 +195,16 @@ class _MyHomePageState extends State<MyHomePage> {
   
   list() {
     return ListView.builder(
-      
+         
       itemCount: deviceList.length, 
       itemBuilder: (context, index) { 
-        return ListTile(
+        return ListTile( 
          contentPadding: EdgeInsets.fromLTRB(0.0, 0.0, 20.0, 0.0),
-         //leading: FlatButton.icon(onPressed:(){}, icon:Icon(Icons.bubble_chart), label: Text("$r")),
         leading:  Text("--->$r",
         style: TextStyle(
           fontSize: 20,
         ),
         ),
-
           title: Text(deviceList[index].deviceName,
           style: TextStyle(
             fontSize: 18,
@@ -246,7 +247,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ],
       ),
     
-      body:  SafeArea(
+      body: deviceList.isEmpty ? Center(child: CircularProgressIndicator()): SafeArea(
               child:Container(
                 decoration:new BoxDecoration(
                     color: Colors.white,
@@ -258,6 +259,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 child: list(),
               ),
+              
       ),
 
 
@@ -313,4 +315,11 @@ class BleDeviceItem {
     int rssi;
     AdvertisementData advertisementData;   
     BleDeviceItem(this.deviceName, this.rssi, this.peripheral, this.advertisementData);
+
+Future<bool> loginAction() async {
+    //replace the below line of code with your login request
+    await new Future.delayed(const Duration(seconds: 2));
+    return true;
+  }
+
 }
